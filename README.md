@@ -49,11 +49,49 @@
 
 ### 4. docker 이미지 빌드
 - 이미지 빌드
-  - Dockerfile을 통해 이미지 생성
+  - Dockerfile을 통해 이미지를 생성한다.
   - 명령어
     - docker build -t 이미지명:[태그명] -f <도커 스크립트 파일경로> <빌드 컨텍스트 위치>
       - <도커 스크립트 파일경로>
-        - 현재위치가 도커 스크립트 파일경로에 위치해있으며, 파일명이 Dockerfile라면 생략가능하다.
+        - 현재 위치가 Dockerfile이 있는 경로이고, 파일명이 기본값인 Dockerfile이라면 생략 가능하다.
+        - DockerfileDev 등 파일명이 다를 경우에는 -f 옵션으로 파일명을 명시해야 한다.
       - <빌드 컨텍스트 위치>
-        - 현재위치에 빌드하고자 하는 대상 파일이 있다면, "." 으로 대체 가능하다.
-    - docker build -t demospring:v1.0 .
+        - Docker 이미지를 빌드할 때 참조할 수 있는 모든 파일과 디렉터리의 위치를 의미한다.
+        - 현재 위치에 빌드 대상 파일이 있다면 "." 으로 대체 가능하다.
+    - 예시
+      - docker build -t demospring:v1.0 .
+
+### 5. docker와 docker-compose 실행
+- spring 컨테이너 실행 시 환경설정 주의 사항
+  - Spring과 DB를 각각 Docker 컨테이너로 실행할 경우, application-local.yml의 DB 접속 정보를 localhost로 설정하면 정상적으로 연결되지 않는다.
+  - 그 이유는 컨테이너 내부에서의 localhost는 해당 컨테이너 자기 자신을 의미하기 때문이다.
+  - 즉, Spring 컨테이너에서의 localhost는 Spring 컨테이너 자신을 가리키므로, 별도로 실행된 DB 컨테이너에 접근할 수 없다.
+  - 따라서 다음과 같이 설정해야 한다.
+    - docker-compose 사용 시 → DB 컨테이너 이름(mysql-container 등)을 host로 지정
+    - 로컬 DB에 접근할 경우 → host.docker.internal 사용
+- 참고
+  - DB는 Docker로 실행하고, Spring은 IntelliJ(로컬)에서 실행하는 경우에는 localhost로 접근 가능하다.
+  - 이는 Docker의 포트 매핑(-p 3306:3306)을 통해 호스트와 컨테이너가 연결되기 때문이다.
+- docker compose 활용
+  - docker-compose란
+    - 일반적으로 로컬 환경에서 복수의 컨테이너(Spring, MySQL, Redis 등)를 일괄 기동할 때 사용하는 도구이다.
+    - docker 설치 시 함께 설치되며, docker-compose.yml 파일을 기반으로 동작한다.
+    - 여러 컨테이너를 하나의 네트워크로 묶어 docker 간 통신이 가능하도록 구성할 수 있다.
+    - 동일 네트워크에 속한 컨테이너는 컨테이너 이름을 host처럼 사용할 수 있다.
+      - 예) jdbc:mysql://mysql-container:3306/ordersystem
+  - docker-compose의 장점
+    - 위에서 설명한 컨테이너 간 localhost 통신 문제를 해결할 수 있다.
+      - docker-compose를 사용하지 않으면, Spring을 Docker로 실행하는지 IntelliJ(로컬)에서 실행하는지에 따라 application-local.yml의 host 정보를 매번 변경해야 한다.
+      - docker-compose를 사용하면 컨테이너 이름 기반 통신이 가능하여 이러한 설정 변경이 필요 없다.
+    - 컨테이너 이름을 기반으로 서비스 간 통신이 가능하여 별도의 IP 설정이 필요 없다.
+    - 여러 컨테이너를 하나의 설정 파일로 관리할 수 있어 환경 구성이 단순해진다.
+    - 개발 환경을 코드로 관리할 수 있어, 동일한 실행 환경을 쉽게 재현할 수 있다.
+    - Spring, MySQL, Redis 등 여러 서비스를 하나의 명령어로 일괄 실행 및 종료할 수 있다.
+  - 실행
+    - docker-compose up -d
+      - 정의된 모든 컨테이너를 백그라운드에서 일괄 실행한다.
+    - docker-compose up -d --build
+      - 이미지 변경 사항이 있을 경우 새로 빌드 후 실행한다.
+  - 중지 및 삭제
+    - docker-compose down
+      - 실행 중인 컨테이너를 일괄 중지하고 네트워크를 함께 정리한다.
