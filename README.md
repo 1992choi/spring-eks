@@ -630,3 +630,33 @@
         - 실제로는 이미지 내용이 바뀌었지만, Kubernetes는 이를 감지하지 못해 기존 Pod가 계속 실행된다.
       - 해결 방법
         - `rollout restart`를 사용하면 강제로 새로운 ReplicaSet을 생성하고 Pod를 재생성하여 최신 이미지를 반영할 수 있다.
+
+### 19. Ingress - 이론 ~ 20. Ingress - 실습
+- Ingress
+  - 클러스터 외부의 HTTP/HTTPS 요청을 내부 Service로 라우팅하는 리소스이다.
+  - 도메인(Host) 또는 경로(Path) 기반으로 트래픽 전달 규칙을 정의한다.
+  - 단독으로는 동작하지 않으며 Ingress Controller가 필요하다.
+- Ingress Controller
+  - Ingress에 정의된 규칙을 실제로 처리하는 구성 요소이다.
+  - 클러스터 내부에서 동작하며 외부 트래픽을 받아 Service로 전달한다.
+  - 예: NGINX Ingress Controller, AWS Load Balancer Controller
+- 구조
+  - ![ingress.png](image/ingress.png)
+- 실습
+  - Ingress Controller 설치
+    - kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/aws/deploy.yaml
+  - 로드 밸런서 및 route 53 설정
+    - EC2 > 로드 밸런서 > 활성 상태인지 확인
+    - route 53 > 호스팅 영역 > 호스팅 선택 > 레코드 생성
+      - 레코드 이름 입력 (ex. server)
+      - 레코드 유형 > 'A – IPv4 주소 및 일부 AWS 리소스로 트래픽 라우팅' 선택
+      - 별칭 활성화
+        - 트래픽 라우팅 대상 : 'Network Load Balancer에 대한 별칭'
+        - 리전 : 서울
+        - 위 2개를 선택했다면, 콤보박스에 선택할 수 있는 로드밸런서 확인가능
+          - 이때 선택 가능한 로드밸런서는 EC2에서 활성 상태인 로드밸런서의 ID와 일치하는지 확인필요
+  - ingress 적용
+    - 1.k8s_basic > 2.multi_pod 로 이동
+    - kubectl apply -f ingress_nginx.yml
+  - 브라우저에 'https://server.choi1992.shop/study/' 접속
+    - nginx의 welcome 페이지가 나온다면 정상
