@@ -436,3 +436,20 @@
   - 노드검색 (설치 및 설정 확인용)
     - kubectl get nodes
       - 앞서 설치한 노드 2개가 조회되면 설치 및 설정완료
+
+### 14. namespace
+- namespace
+  - 네임스페이스란 클러스터 내의 리소스를 분리된 그룹으로 나누는 단위
+- 구조
+  - ![namespace.png](image/namespace.png)
+- 실습
+  - 네임스페이스 생성
+    - kubectl create namespace <my-namespace>
+    - ex. kubectl create namespace study
+  - 전체 네임스페이스 목록 조회
+      - kubectl get namespaces
+  - 네임스페이스 내의 pod, service 등 자원 조회
+      - kubectl get pods -n <my-namespace>
+        - kubectl get pods -n study
+      - kubectl get services -n <my-namespace>
+        - kubectl get services -n study
