@@ -577,3 +577,56 @@
     - pod 1개 삭제
       - kubectl delete pod nginx-replicaset-x994g -n study
     - 다시 pod를 조회(kubectl get pods -n study) 하면, 1개의 pod가 이름이 바뀐 것을 확인할 수 있음
+
+### 18. Deployment
+- Deployment
+  - Deployment는 ReplicaSet을 기반으로 동작하는 상위 리소스이다.
+  - Deployment를 생성하면 내부적으로 ReplicaSet을 생성하고, 해당 ReplicaSet이 실제 Pod를 관리한다.
+  - 즉, Pod 직접 관리가 아닌 ReplicaSet을 관리하는 리소스이다.
+  - 특징
+    - 버전 관리(Revision)
+      - spec.template 값이 변경되면 새로운 ReplicaSet이 생성된다.
+      - 각 변경 이력은 Revision으로 관리된다.
+    - 롤링 업데이트(Rolling Update)
+      - 새로운 Pod를 먼저 생성한 뒤, 기존 Pod를 순차적으로 종료한다.
+      - 서비스 중단 없이 무중단 배포가 가능하다.
+      - 기본 배포 전략은 Rolling Update이다.
+    - 롤백(Rollback)
+      - 문제가 발생하면 이전 Revision으로 손쉽게 되돌릴 수 있다.
+    - 확장성(Scaling)
+      - replicas 값을 변경하여 Pod 개수를 손쉽게 확장/축소할 수 있다.
+  - 정리
+    - ReplicaSet이 “Pod 개수 유지”에 초점을 둔다면,
+    - Deployment는 “배포 전략 + 버전 관리 + 운영 자동화”까지 포함하는 상위 개념이다.
+- 실습
+  - 생성
+    - 1.k8s_basic > 2.multi_pod 로 이동
+    - kubectl apply -f nginx_deployment.yml
+  - 롤백
+    - kubectl rollout undo deployment <deployment명>
+  - 새로운 ReplicaSet 및 Revision 생성 방법
+    - 방법 1) image 변경 후 apply
+      - `nginx_deployment.yml` 파일에서 `spec.template.image` 값을 변경한 뒤 다시 apply
+      - 예:
+        - `nginx:1.21.6`
+        - `nginx:1.22.1`
+        - `nginx:1.24.0`
+      - `spec.template` 값이 변경되면 Kubernetes는 이를 새로운 버전으로 인식
+      - 새로운 ReplicaSet과 새로운 Revision이 생성된다.
+      - 이후 롤링 업데이트 방식으로 Pod가 교체된다.
+    - 방법 2) rollout restart 사용 (실무에서 자주 사용)
+      - 명령어
+        - `kubectl rollout restart deployment <deployment명>`
+      - 동작 원리
+        - Deployment의 `spec.template`에 내부적으로 변경을 발생시켜 Kubernetes가 "새로운 버전"으로 인식하게 만든다.
+        - 그 결과 새로운 ReplicaSet이 생성되고, 기존 Pod를 순차적으로 교체한다.
+      - 왜 필요한가?
+        - 실무에서는 보통 `latest` 태그를 사용하는 경우가 많다.
+        - 예:
+          - `image: myapp:latest`
+        - 새로운 이미지를 빌드해도 image 이름은 동일하다.
+        - 즉, YAML 상의 변경사항이 없기 때문에 Kubernetes는 "변경 없음"으로 판단하여 새로운 ReplicaSet을 생성하지 않는다.
+      - 문제점
+        - 실제로는 이미지 내용이 바뀌었지만, Kubernetes는 이를 감지하지 못해 기존 Pod가 계속 실행된다.
+      - 해결 방법
+        - `rollout restart`를 사용하면 강제로 새로운 ReplicaSet을 생성하고 Pod를 재생성하여 최신 이미지를 반영할 수 있다.
