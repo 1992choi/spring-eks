@@ -9,10 +9,10 @@ metadata:
 spec:
   tls:
   - hosts:
-      - argo.bradkim197.shop
-    secretName: argo-bradkim197-com-tls
+      - argo.choi1992.shop
+    secretName: argo-choi1992-com-tls
   rules:
-  - host: argo.bradkim197.shop
+  - host: argo.choi1992.shop
     http:
       paths:
         - path: /
