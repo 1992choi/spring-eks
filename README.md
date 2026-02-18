@@ -444,12 +444,35 @@
   - ![namespace.png](image/namespace.png)
 - 실습
   - 네임스페이스 생성
-    - kubectl create namespace <my-namespace>
+    - kubectl create namespace <namespace 이름>
     - ex. kubectl create namespace study
   - 전체 네임스페이스 목록 조회
       - kubectl get namespaces
   - 네임스페이스 내의 pod, service 등 자원 조회
-      - kubectl get pods -n <my-namespace>
+      - kubectl get pods -n <namespace 이름>
         - kubectl get pods -n study
-      - kubectl get services -n <my-namespace>
+      - kubectl get services -n <namespace 이름>
         - kubectl get services -n study
+
+### 15. Pod
+- Pod
+  - Pod는 쿠버네티스에서 배포할 수 있는 가장 작은 단위이며, 1개 이상의 컨테이너로 구성된 배포 단위
+- 구조
+  - ![pod.png](image/pod.png)
+- 실습
+  - 생성
+    - 생성은 명령어를 통해 생성하거나 스크립트를 통해 생성할 수 있다. (여기서는 스크립트를 이용)
+    - 1.k8s_basic > 1.pod_basic 로 이동
+    - kubectl apply -f nginx_pod.yml
+  - 조회
+    - kubectl get pods -n <namespace 이름>
+      - kubectl get pods -n study
+  - 삭제
+    - kubectl delete pod <pod 이름>
+      - kubectl delete pod study
+  - 생성 확인
+    - pod 접속 (pod는 외부와 단절된 상태으므로 외부에서 nginx 호출이 불가하여 직접 접속하여 확인이 필요함)
+      - kubectl exec -it <pod 이름> -n <namespace 이름> -- /bin/sh
+        - kubectl exec -it my-nginx -n study -- /bin/sh
+    - curl을 통한 nginx 응답확인 (pod 접속 후 실행)
+      - curl http://localhost
