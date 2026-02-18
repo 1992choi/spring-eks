@@ -468,8 +468,8 @@
     - kubectl get pods -n <namespace 이름>
       - kubectl get pods -n study
   - 삭제
-    - kubectl delete pod
-      - kubectl delete pod study
+    - kubectl delete pod <pod명>
+      - kubectl delete pod my-nginx
     - 또는 kubectl delete -f <파일명>
       - kubectl delete -f nginx_pod.yml
   - 생성 확인
@@ -520,3 +520,60 @@
       - service 호출
         - curl http://<service-name>:<port>
         - ex) curl http://my-service:80
+
+### 17. Replicaset
+- ReplicaSet
+  - ReplicaSet은 지정된 수의 Pod 복제본이 항상 실행되도록 보장하는 쿠버네티스 리소스이다.
+  - 사용자가 정의한 `replicas` 개수만큼 Pod를 유지하며, 장애로 인해 Pod가 종료되면 자동으로 새로운 Pod를 생성한다.
+  - `selector`를 기준으로 자신이 관리할 Pod를 식별한다.
+  - 주로 단독으로 사용하기보다는 Deployment에 의해 관리되는 하위 리소스로 사용된다.
+  - 즉, Pod의 개수 유지(가용성 확보)에 초점을 둔 리소스이다.
+- 스크립트
+  - ```
+    apiVersion: apps/v1
+    kind: ReplicaSet
+    metadata:
+      name: nginx-replicaset
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: nginx
+      template:
+        metadata:
+          labels:
+            app: nginx
+        spec:
+          containers:
+            - name: nginx
+              image: nginx
+              ports:
+                - containerPort: 80
+    ```
+  - replicas
+    - `replicas: 2` 는 동일한 Pod를 2개 항상 유지하겠다는 의미이다.
+    - Pod 중 하나에 장애가 발생하면 ReplicaSet이 자동으로 새로운 Pod를 생성한다.
+  - selector.matchLabels
+    - ReplicaSet이 관리해야 할 Pod를 식별하는 기준이다.
+    - `app: nginx` 라벨을 가진 Pod만 관리 대상이 된다.
+    - 이미 존재하는 Pod라도 해당 라벨이 일치하면 관리 대상에 포함된다.
+  - template
+    - 새로운 Pod를 생성할 때 사용하는 템플릿이다.
+    - ReplicaSet은 이 템플릿을 기반으로 Pod를 생성한다.
+  - template.metadata.labels
+    - 새로 생성되는 Pod에 부여할 라벨을 정의한다.
+    - 위 예제에서는 모든 생성 Pod에 `app: nginx` 라벨이 자동으로 추가된다.
+    - 이 라벨은 반드시 `selector.matchLabels`와 일치해야 한다.
+      - 일치하지 않으면 ReplicaSet이 해당 Pod를 관리하지 못한다.
+    - 또한 Service에서 사용하는 `selector`와도 동일해야 네트워크 연결 및 로드밸런싱이 정상 동작한다.
+- 실습
+  - 생성
+    - 1.k8s_basic > 2.multi_pod 로 이동
+    - kubectl apply -f nginx_replicaset.yml
+  - 확인
+    - 2개의 pod 중 1개를 삭제하면, 1개가 자동으로 설정되는지 확인
+    - 현재 pod 확인
+      - kubectl get pods -n study
+    - pod 1개 삭제
+      - kubectl delete pod nginx-replicaset-x994g -n study
+    - 다시 pod를 조회(kubectl get pods -n study) 하면, 1개의 pod가 이름이 바뀐 것을 확인할 수 있음
