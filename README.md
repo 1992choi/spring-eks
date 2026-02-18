@@ -468,11 +468,55 @@
     - kubectl get pods -n <namespace 이름>
       - kubectl get pods -n study
   - 삭제
-    - kubectl delete pod <pod 이름>
+    - kubectl delete pod
       - kubectl delete pod study
+    - 또는 kubectl delete -f <파일명>
+      - kubectl delete -f nginx_pod.yml
   - 생성 확인
     - pod 접속 (pod는 외부와 단절된 상태으므로 외부에서 nginx 호출이 불가하여 직접 접속하여 확인이 필요함)
       - kubectl exec -it <pod 이름> -n <namespace 이름> -- /bin/sh
         - kubectl exec -it my-nginx -n study -- /bin/sh
     - curl을 통한 nginx 응답확인 (pod 접속 후 실행)
       - curl http://localhost
+
+### 16. Service
+- Service
+  - Service는 클러스터 내에서 실행 중인 Pod들에 대한 네트워크 접근 방법을 제공
+  - pod는 동적으로 생성되고 주소 변경 가능성이 높고, 라우팅의 어려움이 있어서 Service를 이용하여 이러한 단점을 보완
+- 구조
+  - ![service.png](image/service.png)
+- 스크립트
+  - ```
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: my-service
+      namespace: my-namespace
+    spec:
+      ports:
+        - port: 80
+          targetPort: 80
+      selector:
+        app: nginx
+    ```
+  - selector
+    - `selector.app: nginx` 는 `app=nginx` 라는 label을 가진 Pod들을 대상으로 지정한다.
+    - 해당 label을 가진 Pod들에게 Service 네트워크가 연결된다.
+    - 여러 개의 Pod가 selector와 매칭될 경우, Service가 자동으로 로드밸런싱을 수행한다.
+  - port
+    - Service가 클러스터 내부에서 리슨(listen)하는 포트이다.
+    - 다른 Pod 또는 클러스터 내부 컴포넌트가 Service에 접근할 때 사용하는 포트이다.
+  - targetPort
+    - Service가 실제로 트래픽을 전달하는 대상 Pod의 포트이다.
+    - Service로 들어온 요청을 Pod 내부 컨테이너의 해당 포트로 포워딩한다.
+- 실습
+  - 생성
+    - 1.k8s_basic > 1.pod_basic 로 이동
+    - kubectl apply -f nginx_service.yml
+  - 생성 확인
+    - service를 통해 pod로 요청이 들어오는지 확인을 위하여 (pod 접속 > 서비스를 통한 pod 호출이 어색한 흐름이지만, 현재 pod 말고는 접근할 방법이 없기 때문에 이렇게 간접 확인)  
+      - pod 접속
+        - kubectl exec -it my-nginx -n study -- /bin/sh
+      - service 호출
+        - curl http://<service-name>:<port>
+        - ex) curl http://my-service:80

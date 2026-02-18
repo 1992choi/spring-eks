@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+  namespace: study
+spec:
+  # 생략시 default는 ClusterIP.
+  # NodePort, LoadBalancer등의 타입을 사용시 service를 통해 외부접근가능
+  # type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: my-nginx
