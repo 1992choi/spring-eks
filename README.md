@@ -385,3 +385,54 @@
 - 설정확인
   - https://www.whatsmydns.net/
   - 구매한 도메인으로 검색했을 때, O 표시로 나온다면 정상적으로 등록완료 (시간이 다소 걸림)
+
+### 13. 클러스터 생성 및 aws cli, kubectl 세팅
+- iam 설정 (10. AWS핵심요소-iam등 깅의 참고)
+  - 액세스 관리 > 사용자 > 사용자생성
+  - 'AWS Management Console에 대한 사용자 액세스 권한 제공 – 선택 사항' 체크
+  - 콘솔암호 > 자동 생성된 암호
+  - '사용자는 다음 로그인 시 새 암호를 생성해야 합니다 - 권장' 체크 해제
+  - 권한 설정
+    - 권한옵션 > 직접 정책 연결 > AdministratorAccess 체크
+  - 사용자 생성 (생성된 정보는 따로 기입해둘 것 - 로그인 시 사용됨)
+  - 이후 로그인 시에는
+    - 생성 후 만들어진 url로 접근 후, user id / password 로 로그인
+  - 위 정보로 로그인 후 > IAM > 사용자 > 사용자 선택 > 액세스 키 만들기
+  - Command Line Interface(CLI) 선택
+  - 태그 생략
+  - 액세스 키도 따로 기입해둘 것
+- eks 생성 (과금을 막기 위해서 최소한의 사양으로 설정)
+  - Amazon Elastic Kubernetes Service > 클러스터 생성 (리전이 서울인지 확인)
+  - 사용자 지정 구성 
+  - 'EKS 자율 모드 - 신규' 해제
+  - 클러스터 IAM 역할 > 권한 역할 생성 > 추천해준 역할로 생성
+  - 나머지 옵션은 default로 설정하고 생성완료
+- eks 설정
+  - 노드 생성
+    - Amazon Elastic Kubernetes Service > 클러스터 > 클러스터명 클릭 > 컴퓨팅 탭 > 노드 그룹 추가
+    - 노드 IAM 역할 > 권장 역할 생성 > (아래의 절차를 통해 역할 생성 후) 만들어진 역할 선택
+      - 신뢰할 수 있는 엔터티 유형 > 'AWS 서비스' 선택
+      - 사용 사례 > 'EC2' 콤보박스 선택 및 라디오박스 선택
+      - 자동으로 선택되어있는 역할 선택 > 역할 이름 입력 후 생성
+    - 노드 그룹 컴퓨팅 구성
+      - 인스턴스 유형만 변경
+    - 나머지 옵션은 default로 설정하고 생성완료
+- aws cli 설치
+  - 설치
+    - https://docs.aws.amazon.com/ko_kr/cli/latest/userguide/getting-started-install.html
+    - 설치 후 > 터미널에서 명령어로 설치여부 확인 가능
+      - aws --version
+  - 설정
+    - aws configure
+      - iam 설정에서 만든 access key 와 password 입력 
+      - 리전 : ap-northeast-2
+      - output format : json
+- kubectl 설치
+  - 설치
+    - brew install kubectl
+  - 설정
+    - aws eks update-kubeconfig --region ap-northeast-2 --name <eks 클러스터명>
+      - ex. aws eks update-kubeconfig --region ap-northeast-2 --name my-cluster
+  - 노드검색 (설치 및 설정 확인용)
+    - kubectl get nodes
+      - 앞서 설치한 노드 2개가 조회되면 설치 및 설정완료
