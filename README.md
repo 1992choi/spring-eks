@@ -664,3 +664,31 @@
 ### 21. 아키텍처 개요
 - 구조
   - ![spring_architecture.png](image/spring_architecture.png)
+
+### 22. 인프라 자원 생성
+- RDS 생성
+  - Aurora and RDS > 데이터베이스 > 데이터베이스 생성
+    - 손쉬운 생성
+    - MySQL
+    - 샌드박스 (= 프리티어)
+    - 이름 : admin
+    - 자격 증명 관리 : 자체관리
+    - 암호 자동 생성 : 체크
+    - 생성 중 화면에서 상단 모달에 '연결 세부 정보 보기' 클릭하여 비밀번호 따로 기입
+  - 추가설정
+    - 퍼블릭 액세스
+      - 생성된 데이터베이스명 클릭
+      - 추가구성 : '퍼블릭 액세스 가능' 선택 후 수정 > 즉시적용
+    - 인바운드 규칙 (실습할 때는 기본적으로 설정되었기에 진행하지 않음)
+      - 생성된 데이터베이스명 클릭
+      - 보안그룹
+      - TCP / 3306 포트 추가
+  - 스키마 생성
+    - create database ordersystem;
+- ECR 생성
+  - Amazon ECR > 프라이빗 레지스트리 > 리포지토리 > 프라이빗 리포지토리 생성
+    - 리포지토리 이름 : (강의에서는) order-backend
+    - 나머지 설정은 default로 생성
+- Redis 설정
+  - 2.ordersystem > k8s > k8s-ordersystem 로 이동
+  - kubectl apply -f redis.yml
