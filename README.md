@@ -660,3 +660,7 @@
     - kubectl apply -f ingress_nginx.yml
   - 브라우저에 'https://server.choi1992.shop/study/' 접속
     - nginx의 welcome 페이지가 나온다면 정상
+
+### 21. 아키텍처 개요
+- 구조
+  - ![spring_architecture.png](image/spring_architecture.png)
