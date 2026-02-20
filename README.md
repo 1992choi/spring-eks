@@ -776,3 +776,21 @@
       - AWS_SECRET 생성 (aws 생성할 때 만든 secret)
   - HealthController.java의 응답값 변경 후 commit / push
     - 브라우저에서 https://server.choi1992.shop/health 접속 (변경사항이 자동 반영되었다면, 응답값이 변경된 것을 확인할 수 있다.)
+
+### 27. 오토스케일 - pod자동확장
+- 개념
+  - Kubernetes에서 Deployment의 자동 확장(autoscaling)을 설정하려면 Horizontal Pod Autoscaler (HPA)를 사용
+  - HPA는 CPU 사용량이나 사용자 정의 파라미터에 기반하여 파드의 수를 자동으로 조정
+- 실습
+  - hpa
+    - 적용
+      - 2.ordersystem > k8s > k8s-ordersystem 로 이동
+      - kubectl apply -f hpa.yml
+    - 메트릭 서버와 HPA를 통한 pod 현황 조회
+      - kubectl get hpa ordersystem-backend-hpa -n study -w
+  - 부하
+    - 특정 pod로 접속 (새로운 터미널에서 진행)
+      - ex. kubectl exec -it ordersystem-backend-745b796bf7-b264k -n study -- /bin/sh
+    - 부하 시작 (접속한 Pod에서 아래 명령어 입력)
+      - while true; do curl -s http://ordersystem-backend-service/product/list; done
+    - '메트릭 서버와 HPA를 통한 pod 현황 조회' 에서 pod가 늘고있는 것을 확인할 수 있음. 또한 pod를 조회해도 여러개의 pod가 생성된 것을 확인할 수 있음
