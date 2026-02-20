@@ -919,3 +919,26 @@
   - 유레카를 제외하고 k8s의 서비스 디스커버리(service) 이용
     - 로컬에서는 유레카를 이용했었는데, k8s에서는 유레카를 사용하지 않아도 됨.
   - gateway에서 k8s의 service를 이용해 로드밸런싱
+
+### 39. api-gateway 배포
+- RDS 작업
+  - create database ordermsa;
+- 각 프로젝트별 ECR 레포 설정
+  - Amazon ECR > 프라이빗 레지스트리 > 리포지토리 > 생성 (이름을 제외한 모든 옵션은 default)
+    1. apigateway
+    2. ordering-service
+    3. member-service
+    4. product-service
+- kubectl apply
+  - apigateway
+    - 3.msa > apigateway > k8s 으로 이동
+    - kubectl apply -f depl_svc.yml
+  - ingress
+    - 3.msa > k8s 으로 이동
+    - kubectl apply -f ingress.yml
+  - https
+    - 3.msa > k8s 으로 이동
+    - kubectl apply -f https.yml
+  - member
+    - 3.msa > apigateway > k8s 으로 이동
+    - kubectl apply -f depl_svc.yml
