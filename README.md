@@ -745,3 +745,34 @@
 
 ### 25. https통신을 위한 인증서 작업
 - 정리가 꼭 필요한 항목이 아니라 제외
+
+### 26. github actions와 CI/CD 자동화
+- GitHub Actions 개념
+  - GitHub Actions 이란
+    - 저장소에서 직접 CI/CD 파이프라인을 구성하는 기능
+    - 이벤트 기반으로 개발 워크플로우를 자동화
+  - 기본 구성 요소
+    - 워크플로우 (Workflows)
+      - 하나 이상의 Job을 포함하는 자동화 프로세스
+      - 특정 이벤트 발생 시 실행
+      - .github/workflows 경로에 YAML 파일로 정의
+    - 이벤트 (Events)
+      - 워크플로우 실행을 트리거하는 활동
+      - 예: push, pull_request, issue 생성 등
+    - 작업 (Jobs)
+      - 워크플로우 내 실행 단위
+      - 여러 Step으로 구성
+    - 러너 (Runners) - runs-on
+      - 워크플로우가 실행되는 가상 서버
+      - Linux, Windows, macOS 환경 제공
+    - 액션 (Actions) - uses, run
+      - 재사용 가능한 작업 단위
+      - 공식 액션 및 커뮤니티 액션 사용 가능
+- 실습
+  - .github > workflows > yml 파일생성
+  - Secret 생성
+    - 깃허브 > Repo > Settings > Secrets and variables > Actions > Repository secrets
+      - AWS_KEY 생성 (aws 생성할 때 만든 key)
+      - AWS_SECRET 생성 (aws 생성할 때 만든 secret)
+  - HealthController.java의 응답값 변경 후 commit / push
+    - 브라우저에서 https://server.choi1992.shop/health 접속 (변경사항이 자동 반영되었다면, 응답값이 변경된 것을 확인할 수 있다.)
