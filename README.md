@@ -794,3 +794,6 @@
     - 부하 시작 (접속한 Pod에서 아래 명령어 입력)
       - while true; do curl -s http://ordersystem-backend-service/product/list; done
     - '메트릭 서버와 HPA를 통한 pod 현황 조회' 에서 pod가 늘고있는 것을 확인할 수 있음. 또한 pod를 조회해도 여러개의 pod가 생성된 것을 확인할 수 있음
+
+### 28 ~ 30. 오토스케일 - 인스턴스(EC2)
+- 정리가 꼭 필요한 항목이 아니라 제외
