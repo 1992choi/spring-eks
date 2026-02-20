@@ -904,3 +904,8 @@
   - Kafka 설정을 위한 docker compose
     - 3.msa > ordering 으로 이동
     - docker-compose up -d
+
+### 37. 로컬 서버 실행
+- 코드수정 및 실행
+  - @FeignClient(name = "product-service", url="http://product-service") 코드 중 로컬에서 실행할 때는 url="http://product-service"를 제외해야함 
+  - 모든 application.yml의 profile을 local로 변경 후 인텔리제이에서 각 모듈 실행
