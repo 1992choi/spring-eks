@@ -879,3 +879,28 @@
   - 대시보드 설정
     - Dashboard → Import → 대시보드 템플릿 ID에 '1860' 로 조회하여 적용
       - 용도에 맞게 템플릿 사용하면 된다.
+
+### 36. 로컬 서버 환경구성
+- 구조
+  - ![msa_architecture.png](image/msa_architecture.png)
+- 핵심요소
+  - Gateway (API 게이트웨이)
+    - Spring Cloud Gateway는 시스템의 입구 역할을 하는 API 게이트웨이
+    - 모든 클라이언트 요청은 gateway의 단일 진입점을 통해 각 서비스로 라우팅
+    - cors처리, 인증처리 등 서버 공통 사항을 단일 진입점에서 처리하여 중복 방지
+  - eureka(서비스디스커버리 )
+    - Eureka 서버는 모든 마이크로서비스의 위치 정보를 가지고 있으며, 마이크로서비스의 위치를 탐색하는 서비스디스커버리(서비스레지스트리)  역할 수행
+  - 모듈간 동기통신과 비동기 통신
+    - 동기통신
+      - 반드시 응답을 기다려야 하는 종류의 API요청의 경우 동기통신
+      - msa 아키텍처에서 서비스 간의 통신을 간편하게 할 수 있도록 도와주는 feignclient 활용(또는 resttemplate 등)
+    - 비동기통신
+      - 반드시 응답을 기다릴 필요가 없거나 응답이 오래걸리는 API요청의 경우
+      - kafka를 활용하여 이벤트기반 비동기 통신
+- 서비스 시작
+  - DB 설정
+    - mysql 스키마 생성 (로컬 DB)
+      - create database ordermsa;
+  - Kafka 설정을 위한 docker compose
+    - 3.msa > ordering 으로 이동
+    - docker-compose up -d
