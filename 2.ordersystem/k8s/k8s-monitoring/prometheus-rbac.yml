@@ -5,12 +5,12 @@ kind: ClusterRole
 metadata:
   name: prometheus
 rules:
-# apiGroups가 "" 인경우 core그룹(pods, serivce, nodes 등)
-# apps그룹은 depl, svc 등
+  # apiGroups가 "" 인경우 core그룹(pods, serivce, nodes 등)
+  # apps그룹은 depl, svc 등
   - apiGroups: [""]
-  # 노드에 대한 권한
+    # 노드에 대한 권한
     resources: ["nodes", "nodes/metrics"]
-  # 조회권한 : kubectl get node, kubectl get nodes, kubectl get node --watch
+    # 조회권한 : kubectl get node, kubectl get nodes, kubectl get node --watch
     verbs: ["get", "list", "watch"]
 ---
 # 2. ServiceAccount : Pod를 위한 계정
@@ -26,13 +26,13 @@ kind: ClusterRoleBinding
 metadata:
   name: prometheus
 roleRef:
-# rbac는 roles, rolebindings, clusterroles등
-# 다른 api그룹 자원들간의 매핑에서는 apiGroup명시 필수
+  # rbac는 roles, rolebindings, clusterroles등
+  # 다른 api그룹 자원들간의 매핑에서는 apiGroup명시 필수
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: prometheus
 subjects:
-# serviceAccount자원은 core그룹에 속하므로 생략가능
+  # serviceAccount자원은 core그룹에 속하므로 생략가능
   - kind: ServiceAccount
     name: prometheus
     namespace: monitoring

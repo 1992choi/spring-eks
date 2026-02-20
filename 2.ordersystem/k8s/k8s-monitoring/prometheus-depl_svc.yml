@@ -13,26 +13,26 @@ spec:
       labels:
         app: prometheus
     spec:
-    # rabc에서 만든 ServiceAccount를 Prometheus Pod에 연결
-    # Prometheus는 node에 접근하여 node-exporter로부터 정보를 수집
+      # rabc에서 만든 ServiceAccount를 Prometheus Pod에 연결
+      # Prometheus는 node에 접근하여 node-exporter로부터 정보를 수집
       serviceAccountName: prometheus
       containers:
         - name: prometheus
           image: prom/prometheus
           args:
-          # 아래 volumnMount를 통해 저장된 prometheus.yml 파일을 read
-          # 이 파일을 기반으로 node-exporter에서 시스템 정보를 수집
+            # 아래 volumnMount를 통해 저장된 prometheus.yml 파일을 read
+            # 이 파일을 기반으로 node-exporter에서 시스템 정보를 수집
             - "--config.file=/etc/prometheus/prometheus.yml"
           ports:
             - containerPort: 9090
           resources:
-          # 컨테이너가 사용할수 있는 리소스의 최대치
+            # 컨테이너가 사용할수 있는 리소스의 최대치
             limits:
               cpu: "1"
               memory: "500Mi"
-          # 컨테이너가 시작될떄 보장받아야 하는 최소 자원
+            # 컨테이너가 시작될떄 보장받아야 하는 최소 자원
             requests:
-              cpu: "0.5"
+              cpu: 300m
               memory: "250Mi"
           volumeMounts:
             - name: config-volume

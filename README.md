@@ -856,3 +856,26 @@
       - ID : admin
       - 비밀번호는 아래 명령어 실행 후 나온 값을 디코딩
         - kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}"
+
+### 33 ~ 34. 프로메테우스,그라파나
+- 적용
+  - 2.ordersystem > k8s > k8s-monitoring 로 이동
+  - kubectl create namespace monitoring
+  - kubectl apply -f node_exporter.yml
+  - kubectl apply -f prometheus-config.yml
+  - kubectl apply -f prometheus-rbac.yml
+  - kubectl apply -f prometheus-depl_svc.yml
+  - kubectl apply -f grafana-depl_svc.yml
+- 접속
+  - argocd와 다르게 로컬 환경에서 접근 (퍼블릭으로 열고 싶다면, argocd와 동일하게 작업하면 됨)
+  - kubectl port-forward svc/grafana 3000:3000 -n monitoring
+  - localhost:3000
+    - admin / admin 으로 로그인
+  - Grafana에서 Prometheus 연동
+    - 로그인 후 > Connections > Data Sources
+    - Add data source > Prometheus 선택
+    - URL에 http://prometheus-service:9090
+    - Save & Test
+  - 대시보드 설정
+    - Dashboard → Import → 대시보드 템플릿 ID에 '1860' 로 조회하여 적용
+      - 용도에 맞게 템플릿 사용하면 된다.
