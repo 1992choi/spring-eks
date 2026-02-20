@@ -717,12 +717,12 @@
 ### 24. 쿠버네티스 자원 생성
 - Secret
   - 생성
-    - kubectl create secret generic my-app-secrets --from-literal=DB_HOST=<생성된 도메인 주소> --from-literal=DB_PW=<발급 받은 비밀번호> -n study
+    - kubectl create secret generic my-app-secrets --from-literal=DB_HOST=<생성된 도메인 주소> --from-literal=DB_PW=<발급 받은 비밀번호> --from-literal=SECRET_KEY=<발급 받은 비밀번호> --from-literal=SECRET_KEY_RT=<발급 받은 비밀번호> -n study
   - 조회
     - kubectl get secret my-app-secrets -o yaml -n study
       - 조회된 값은 Base64로 인코딩된 값 (디코딩하면 실제 값을 알 수 있다.) 
   - 삭제
-    - kubectl delete secret my-app-secrets
+    - kubectl delete secret my-app-secrets -n study
   - 수정
     - Secret은 수정하는 명령어를 제공하지 않으므로, 삭제 후 생성해야한다.
 - Deployment 적용
