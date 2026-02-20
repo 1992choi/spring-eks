@@ -21,6 +21,7 @@ spring :
     show_sql: true
 jwt:
   expiration: 1000
-  secretKey: ${SECRET_KEY}
+  # 실제 실무에서는 secretKey값도 secret화 시켜야 할것. 
+  secretKey: YmV5b25kYWNjZXNzdG9rZW5zZWNyZXRrZXliZXlvbmRhY2Nlc3N0b2tlbnNlY3JldGtleWJleW9uZGFjY2Vzc3Rva2Vuc2VjcmV0a2V5
   expirationRt: 288000
-  secretKeyRt: ${SECRET_KEY_RT}
+  secretKeyRt: YmV5b25kcmVmcmVzaHRva2Vuc2VjcmV0a2V5YmV5b25kcmVmcmVzaHRva2Vuc2VjcmV0a2V5YmV5b25kcmVmcmVzaHRva2Vuc2VjcmV0a2V5
