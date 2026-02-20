@@ -942,3 +942,24 @@
   - member
     - 3.msa > apigateway > k8s 으로 이동
     - kubectl apply -f depl_svc.yml
+- 확인
+  - ```
+    curl -k -X POST https://server.choi1992.shop/member-service/member/doLogin \
+        -H "Content-Type: application/json" \
+        -d '{
+        "email": "admin@naver.com",
+        "password": "12341234"
+        }'
+    ```
+
+### 40. 각 서비스 모듈 배포 및 마무리
+- 주키퍼 및 카프카 실행
+  - 3.msa > k8s 으로 이동
+  - kubectl apply -f zookeeper.yml
+  - kubectl apply -f kafka.yml
+- ordering
+  - 3.msa > ordering > k8s 으로 이동
+  - kubectl apply -f depl_svc.yml
+- product
+  - 3.msa > product > k8s 으로 이동
+  - kubectl apply -f depl_svc.yml
