@@ -797,3 +797,62 @@
 
 ### 28 ~ 30. 오토스케일 - 인스턴스(EC2)
 - 정리가 꼭 필요한 항목이 아니라 제외
+
+### 31 ~ 32. argocd
+- 개념
+  - Argo CD는 GitOps 방식의 CD(Continuous Delivery) 도구
+    - k8s의 상태를 Git 저장소로부터 가져와 자동으로 Kubernetes에 배포
+  - 장점
+    - 사람의 실수를 줄이고, 변경 이력 관리가 명확
+      - 모든 Kubernetes 리소스 상태를 Git에서 관리하여 이력을 관리하고, 누군가 수동으로 클러스터 상태를 바꿔도 k8s자원 유지
+    - 웹 UI를 통한 실시간 상태 모니터링
+      - 웹 UI를 통해 애플리케이션 상태, 배포 이력, Sync 상태를 시각적으로 확인 가능
+- 실습
+  - 네임스페이스 생성
+    - kubectl create namespace argocd
+  - 핵심 컴포넌트들 설치
+    - kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+  - application 적용
+    - 2.ordersystem > k8s > k8s-argocd 로 이동
+    - kubectl apply -f argocd-application.yaml -n argocd
+  - 적용 확인
+    - kubectl apply -f argocd-application.yaml -n argocd
+      - 모두 running 상태라면 OK.
+      - 만약 pending이 있다면, 리소스 부족일 수 있음. EC2를 늘려줘야함
+  - 웹 UI 설정
+    - ArgoCD 서버의 HTTPS 설정을 끄기
+      - kubectl edit deployment argocd-server -n argocd
+      - 파일변경 UI가 뜨면, /usr/local/bin/argocd-server 아래 줄에 -- insecure 추가
+        - ```
+          containers:
+          - args:
+           - /usr/local/bin/argocd-server
+           - --insecure
+          ```
+      - argocd-server에 --insecure 옵션을 추가하는 이유
+        - argocd-server는 기본적으로 HTTPS(443)로 동작한다.
+        - 현재 구조에서는 Ingress(ALB/NLB)에서 이미 HTTPS(TLS)를 처리하고 있다.
+        - 이 상태에서 argocd-server까지 HTTPS를 사용하면 HTTPS가 이중 적용될 수 있다.
+        - 이중 HTTPS가 발생하면 리다이렉트 오류 또는 접속 문제가 생길 수 있다.
+        - 따라서 argocd-server의 내부 TLS를 비활성화하여 HTTP로만 동작하도록 설정한다.
+        - 결과적으로 Ingress에서 HTTPS를 처리하고, argocd-server는 내부적으로 HTTP로 통신하게 된다.
+        - 실무에서는 kubectl edit 방식으로 직접 수정하지 않는다.
+          - 수동 변경은 GitOps 원칙에 맞지 않는다.
+          - 재설치하거나 업데이트하면 설정이 사라질 수 있다.
+          - 일반적으로는 Helm values.yaml 또는 별도의 patch yaml 파일로 관리한다.
+    - 서브 도메인 추가
+      - Route 53 > 레코드 생성
+        - 레코드 이름 입력 (ex. argo)
+        - 레코드 유형 > 'A – IPv4 주소 및 일부 AWS 리소스로 트래픽 라우팅' 선택
+        - 별칭 활성화
+          - 트래픽 라우팅 대상 : 'Network Load Balancer에 대한 별칭'
+          - 리전 : 서울
+          - 로드밸런서 : 이전에 만든게 있어서 1개가 활성화 될 것임
+    - ingress 적용
+      - 2.ordersystem > k8s > k8s-argocd 로 이동
+      - kubectl apply -f argocd-ingress.yml
+    - 접속
+      - https://argo.choi1992.shop/
+      - ID : admin
+      - 비밀번호는 아래 명령어 실행 후 나온 값을 디코딩
+        - kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}"
