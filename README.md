@@ -909,3 +909,13 @@
 - 코드수정 및 실행
   - @FeignClient(name = "product-service", url="http://product-service") 코드 중 로컬에서 실행할 때는 url="http://product-service"를 제외해야함 
   - 모든 application.yml의 profile을 local로 변경 후 인텔리제이에서 각 모듈 실행
+
+### 38. EKS 배포 개요
+- 구조
+  - ![msa_architecture2.png](image/msa_architecture2.png)
+- 라우팅 흐름
+  - ingress-controller(ingress) > api gateway > 각 서비스 모듈
+- 서비스 디스커버리 방식
+  - 유레카를 제외하고 k8s의 서비스 디스커버리(service) 이용
+    - 로컬에서는 유레카를 이용했었는데, k8s에서는 유레카를 사용하지 않아도 됨.
+  - gateway에서 k8s의 service를 이용해 로드밸런싱
