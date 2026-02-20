@@ -3,7 +3,7 @@ spring :
     activate:
       on-profile: prod
   redis:
-  # k8s의 redis 서비스명을 지정
+    # k8s의 redis 서비스명을 지정
     host: redis-service
     port: 6379
   datasource:
@@ -22,6 +22,6 @@ spring :
 jwt:
   expiration: 1000
   # 실제 실무에서는 secretKey값도 secret화 시켜야 할것. 
-  secretKey: YmV5b25kYWNjZXNzdG9rZW5zZWNyZXRrZXliZXlvbmRhY2Nlc3N0b2tlbnNlY3JldGtleWJleW9uZGFjY2Vzc3Rva2Vuc2VjcmV0a2V5
+  secretKey: 유저의 키
   expirationRt: 288000
-  secretKeyRt: YmV5b25kcmVmcmVzaHRva2Vuc2VjcmV0a2V5YmV5b25kcmVmcmVzaHRva2Vuc2VjcmV0a2V5YmV5b25kcmVmcmVzaHRva2Vuc2VjcmV0a2V5
+  secretKeyRt: 유저의 키

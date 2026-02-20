@@ -692,3 +692,56 @@
 - Redis 설정
   - 2.ordersystem > k8s > k8s-ordersystem 로 이동
   - kubectl apply -f redis.yml
+
+### 23. 이미지 빌드/push
+- 스프링 설정
+  - profile 변경
+    - application.yml의 profiles를 local에서 prod로 변경
+  - DB 등 접속정보
+    - application.yml에 접속정보를 그대로 적으면 보안상 위험할 수 있기 때문에 k8s의 secret을 사용
+- 로컬에서 ECR 로그인
+  - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 874777259027.dkr.ecr.ap-northeast-2.amazonaws.com/order-backend
+- 로컬에서 도커 이미지 빌드 및 push
+  - 빌드
+    - 2.ordersystem의 dockerfile 위치로 이동
+    - docker build -t 874777259027.dkr.ecr.ap-northeast-2.amazonaws.com/order-backend:latest .
+  - push
+    - docker push 874777259027.dkr.ecr.ap-northeast-2.amazonaws.com/order-backend:latest
+  - 확인
+    - aws > ECR > 이미지에서 확인 가능
+  - 추가 수정사항
+    - 위에 빌드 & push로 했을 때, '24. 쿠버네티스 자원 생성 > Deployment 적용' 단계에서 오류 발생.
+    - 원인을 파악하다보니 아키텍처 mismatch 문제. 따라서 아래 스크립트로 실행해야함.
+    - docker buildx build --platform linux/amd64 -t 874777259027.dkr.ecr.ap-northeast-2.amazonaws.com/order-backend:latest --push .
+
+### 24. 쿠버네티스 자원 생성
+- Secret
+  - 생성
+    - kubectl create secret generic my-app-secrets --from-literal=DB_HOST=<생성된 도메인 주소> --from-literal=DB_PW=<발급 받은 비밀번호> -n study
+  - 조회
+    - kubectl get secret my-app-secrets -o yaml -n study
+      - 조회된 값은 Base64로 인코딩된 값 (디코딩하면 실제 값을 알 수 있다.) 
+  - 삭제
+    - kubectl delete secret my-app-secrets
+  - 수정
+    - Secret은 수정하는 명령어를 제공하지 않으므로, 삭제 후 생성해야한다.
+- Deployment 적용
+  - 적용
+    - 2.ordersystem > k8s > k8s-ordersystem 로 이동
+    - kubectl apply -f depl_svc.yml
+  - 확인
+    - kubectl get pods -n study
+      - 모두 running 상태인지 확인. 만약 그렇지 않다면,
+        - kubectl logs -f ordersystem-backend-67d987d857-4m8v6 -n study
+        - 또는 kubectl describe pod ordersystem-backend-67d987d857-4m8v6 -n study
+    - 모두 Running 상태가 되었고, DB의 member 테이블에 admin 계정이 생성되었다면 정상
+- ingress
+  - ingress 컨트롤러 적용
+    - kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/aws/deploy.yaml
+  - ingress 적용
+    - kubectl apply -f ingress.yml
+  - 확인
+    - 브라우저에서 https://server.choi1992.shop/health 접속
+
+### 25. https통신을 위한 인증서 작업
+- 정리가 꼭 필요한 항목이 아니라 제외
